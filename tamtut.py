@@ -4,6 +4,8 @@ import random
 from PIL import ImageTk, Image
 import tkinter as tk
 
+# DEPRECATED: This file is no longer maintained and may be removed in future releases.
+
 # Get the directory where this script is located, for relative paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
