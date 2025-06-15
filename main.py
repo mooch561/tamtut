@@ -8,6 +8,10 @@ from kivy.uix.image import Image
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 
+try:
+    long
+except NameError:
+    long = int
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
