@@ -1,26 +1,23 @@
 import os
 import glob
+
 import random
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.image import Image
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
+from kivy.core.window import Window
 
-# to handle latest cython during bundling for android
-try:
-    long
-except NameError:
-    long = int
+# Tamil vowels (Uyir Ezhuthu)
+TAMIL_VOWELS = [
+    "அ", "ஆ", "இ", "ஈ", "உ", "ஊ", "எ", "ஏ", "ஐ", "ஒ", "ஓ", "ஔ", "ஃ"
+]
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-class TamLetter:
-    def __init__(self, t, p):
-        self.type = t
-        self.pos = p
-        self.filename = os.path.join(BASE_DIR, "images", f"{self.type}{self.pos}.JPG")
+# Tamil consonants (Mei Ezhuthu)
+TAMIL_CONSONANTS = [
+    "க", "ங", "ச", "ஞ", "ட", "ண", "த", "ந", "ப", "ம", "ய", "ர", "ல", "வ", "ழ", "ள", "ற", "ன"
+]
 
 class FlashCard:
     def __init__(self, l, r):
@@ -47,46 +44,35 @@ class FlashCard:
         else:
             return self.next_rnd()
 
-def get_letters(letter_type):
-    prefix = os.path.join(BASE_DIR, "images", f"{letter_type}*.JPG")
-    files = sorted(glob.glob(prefix))
-    letter_objs = []
-    for f in files:
-        p = os.path.basename(f).replace(".JPG", "").replace(letter_type, "")
-        letter_objs.append(TamLetter(letter_type, p))
-    return letter_objs
-
 class TamtutApp(App):
     def build(self):
         self.is_v_or_c = 1      # 0 for vowels, 1 for consonants
         self.is_seq_or_rand = 0 # 0 for sequence, 1 for random
 
-        self.vLetters = get_letters('v')
-        self.cLetters = get_letters('c')
+        self.vLetters = TAMIL_VOWELS
+        self.cLetters = TAMIL_CONSONANTS
         self.flashCard = FlashCard(1, len(self.cLetters))
 
         main_layout = BoxLayout(orientation="vertical", padding=10, spacing=10)
-        self.header = Image(source=os.path.join(BASE_DIR, "images", "header.JPG"), size_hint=(1, 0.3))
-        main_layout.add_widget(self.header)
 
-        self.img = Image(size_hint=(1, 0.5))
-        main_layout.add_widget(self.img)
+        # Large Tamil character display
+        self.letter_label = Label(
+            text="", font_size=self.get_dynamic_font_size(), size_hint=(1, 0.6)
+        )
+        main_layout.add_widget(self.letter_label)
 
         self.status = Label(text="Welcome!", size_hint=(1, 0.1))
         main_layout.add_widget(self.status)
 
         # Controls
         controls = BoxLayout(size_hint=(1, 0.1))
-
         self.next_btn = Button(text="Next Alphabet")
         self.next_btn.bind(on_press=self.show_next)
         controls.add_widget(self.next_btn)
-
         main_layout.add_widget(controls)
 
         # Toggles
         toggles = BoxLayout(size_hint=(1, 0.1))
-
         self.vowel_btn = ToggleButton(text="Vowels", group="vc", on_press=self.set_vowel, allow_no_selection=False)
         toggles.add_widget(self.vowel_btn)
         self.cons_btn = ToggleButton(text="Consonants", group="vc", on_press=self.set_consonant, state='down', allow_no_selection=False)
@@ -95,22 +81,32 @@ class TamtutApp(App):
         toggles.add_widget(self.seq_btn)
         self.rand_btn = ToggleButton(text="Random", group="seqrand", on_press=self.set_rand, allow_no_selection=False)
         toggles.add_widget(self.rand_btn)
-
         main_layout.add_widget(toggles)
 
-        self.show_next()
+        # Bind window resize for dynamic font
+        Window.bind(on_resize=self.on_window_resize)
 
+        self.show_next()
         return main_layout
+
+    def get_dynamic_font_size(self):
+        # Use a fraction of screen height for font size
+        return Window.height * 0.4
+
+    def on_window_resize(self, instance, width, height):
+        self.letter_label.font_size = self.get_dynamic_font_size()
 
     def set_vowel(self, instance):
         self.is_v_or_c = 0
         self.flashCard.hrange = len(self.vLetters)
         self.status.text = "Now showing: Vowels"
+        self.show_next()
 
     def set_consonant(self, instance):
         self.is_v_or_c = 1
         self.flashCard.hrange = len(self.cLetters)
         self.status.text = "Now showing: Consonants"
+        self.show_next()
 
     def set_seq(self, instance):
         self.is_seq_or_rand = 0
@@ -125,9 +121,12 @@ class TamtutApp(App):
     def show_next(self, instance=None):
         letters = self.cLetters if self.is_v_or_c else self.vLetters
         pos = self.flashCard.next()
-        letter = next((x for x in letters if int(x.pos) == int(pos)), letters[0])
-        self.img.source = letter.filename
-        self.status.text = f"Type: {letter.type.upper()}, Pos: {letter.pos}"
+        # Clamp to available range
+        idx = min(max(pos - 1, 0), len(letters) - 1)
+        letter = letters[idx]
+        self.letter_label.text = letter
+        typetxt = "Consonant" if self.is_v_or_c else "Vowel"
+        self.status.text = f"Type: {typetxt}, Pos: {idx+1} Letter: {letter}"
 
 if __name__ == "__main__":
     TamtutApp().run()
