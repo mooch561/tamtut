@@ -8,6 +8,7 @@ from kivy.uix.image import Image
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 
+# to handle latest cython during bundling for android
 try:
     long
 except NameError:
