@@ -9,6 +9,11 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.label import Label
 from kivy.core.window import Window
 
+try:
+  long
+except NameError:
+  long = int
+
 # Tamil vowels (Uyir Ezhuthu)
 TAMIL_VOWELS = [
     "அ", "ஆ", "இ", "ஈ", "உ", "ஊ", "எ", "ஏ", "ஐ", "ஒ", "ஓ", "ஔ", "ஃ"
