@@ -57,7 +57,8 @@ class TamtutApp(App):
 
         # Large Tamil character display
         self.letter_label = Label(
-            text="", font_size=self.get_dynamic_font_size(), size_hint=(1, 0.6)
+            text="", font_size=self.get_dynamic_font_size(), size_hint=(1, 0.6),
+            font_name="fonts/Noto_Sans_Tamil/NotoSansTamil-VariableFont_wdth,wght.ttf"
         )
         main_layout.add_widget(self.letter_label)
 
@@ -91,7 +92,7 @@ class TamtutApp(App):
 
     def get_dynamic_font_size(self):
         # Use a fraction of screen height for font size
-        return Window.height * 0.4
+        return Window.height * 0.5
 
     def on_window_resize(self, instance, width, height):
         self.letter_label.font_size = self.get_dynamic_font_size()
