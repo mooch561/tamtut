@@ -62,12 +62,13 @@ class TamtutApp(App):
 
         # Large Tamil character display
         self.letter_label = Label(
-            text="", font_size=self.get_dynamic_font_size(), size_hint=(1, 0.6),
+            text="", font_size=self.get_dynamic_font_size(), size_hint=(0.8, 0.4),
             font_name="fonts/Noto_Sans_Tamil/NotoSansTamil-VariableFont_wdth,wght.ttf"
         )
         main_layout.add_widget(self.letter_label)
 
-        self.status = Label(text="Welcome!", size_hint=(1, 0.1))
+        self.status = Label(text="Welcome!", size_hint=(1, 0.1),
+                           font_name="fonts/Noto_Sans_Tamil/NotoSansTamil-VariableFont_wdth,wght.ttf"))
         main_layout.add_widget(self.status)
 
         # Controls
